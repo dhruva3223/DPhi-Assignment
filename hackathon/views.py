@@ -4,6 +4,7 @@ from rest_framework import status
 from .models import Hackathon, UserHackathon, Submission
 from .serializers import HackathonSerializer, UserHackathonSerializer, SubmissionSerializer
 from .permissions import IsAuthorizedUser, IsAuthorizedUserExceptPost
+from django.core.exceptions import ObjectDoesNotExist
 
 class HackathonListCreateAPIView(APIView):
     permission_classes = [IsAuthorizedUserExceptPost]
@@ -71,7 +72,7 @@ class UserSubmissionListAPIView(APIView):
         serializer = SubmissionSerializer(data=request.data)
         try:
             register = UserHackathon.objects.get(user=request.data["user"], hackathon=request.data["hackathon"])
-        except UserHackathon.DoesNotExist:
+        except ObjectDoesNotExist:
             return Response("User is not registered for the specified hackathon.", status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
             serializer.save(user=request.user, hackathon_id=hackathon_id)
